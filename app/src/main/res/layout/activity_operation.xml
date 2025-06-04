@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 正常的 UI 内容区域 -->
+    <LinearLayout
+        android:id="@+id/main_ui_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme" />
+
+        <Button
+            android:id="@+id/btn_ppg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/PPG" />
+
+        <Button
+            android:id="@+id/btn_acc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/acceleration" />
+
+        <Button
+            android:id="@+id/btn_gyro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/gyro" />
+
+        <FrameLayout
+            android:id="@+id/config_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/data_display_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>
