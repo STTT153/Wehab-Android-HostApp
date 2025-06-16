@@ -68,31 +68,4 @@ public class AccelConfig {
 
         return data;
     }
-
-
-
-
-    // ---- Getters / Setters ----
-    public int getRangeG() { return rangeG; }
-    public void setRangeG(int rangeG) { this.rangeG = rangeG; }
-
-    public int getOdrHz() { return odrHz; }
-    public void setOdrHz(int odrHz) { this.odrHz = odrHz; }
-
-    public int getSendIntervalMs() { return sendIntervalMs; }
-    public void setSendIntervalMs(int sendIntervalMs) { this.sendIntervalMs = sendIntervalMs; }
-
-    public int getOffsetX() { return offsetX; }
-    public void setOffsetX(int offsetX) { this.offsetX = offsetX; }
-
-    public int getOffsetY() { return offsetY; }
-    public void setOffsetY(int offsetY) { this.offsetY = offsetY; }
-
-    public int getOffsetZ() { return offsetZ; }
-    public void setOffsetZ(int offsetZ) { this.offsetZ = offsetZ; }
-
-    public boolean isEnabled() { return enabled; }
-    public void setEnabled(boolean enabled) { this.enabled = enabled; }
-
-
 }

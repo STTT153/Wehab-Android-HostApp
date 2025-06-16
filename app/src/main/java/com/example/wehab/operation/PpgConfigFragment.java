@@ -1,4 +1,5 @@
 package com.example.wehab.operation;
+
 import static com.example.wehab.protocal.Protocal.UUID_CHARACTERISTIC_WRITE;
 import static com.example.wehab.protocal.Protocal.UUID_SERVICE;
 
@@ -19,17 +20,17 @@ import com.clj.fastble.BleManager;
 
 import com.clj.fastble.exception.BleException;
 import com.example.wehab.R;
-import com.example.wehab.protocal.AccelConfig;
+import com.example.wehab.protocal.PpgConfig;
 
-public class AccelConfigFragment extends DialogFragment {
+public class PpgConfigFragment extends DialogFragment {
     // UI相关变量
-    private EditText editRange, editOrd, editInterval, editX, editY, editZ;
+    private EditText editInterval;
     private Button btnConfirm;
     // 业务逻辑相关变量
     public static final String KEY_DATA = "key_data";
     private BleDevice bleDevice;
 
-    public AccelConfigFragment() {}
+    public PpgConfigFragment() {}
 
     @Nullable
     @Override
@@ -60,12 +61,7 @@ public class AccelConfigFragment extends DialogFragment {
     }
 
     private void initView(View view){
-        editRange = view.findViewById(R.id.edit_range);
-        editOrd = view.findViewById(R.id.edit_ord);
         editInterval = view.findViewById(R.id.edit_interval);
-        editX = view.findViewById(R.id.edit_xoffset);
-        editY = view.findViewById(R.id.edit_yoffset);
-        editZ = view.findViewById(R.id.edit_zoffset);
         btnConfirm = view.findViewById(R.id.btn_confirm);
     }
 
@@ -78,14 +74,8 @@ public class AccelConfigFragment extends DialogFragment {
     private void setUpListeners(){
         btnConfirm.setOnClickListener(v -> {
             try {
-                int range = Integer.parseInt(editRange.getText().toString().trim());
-                int ord = Integer.parseInt(editOrd.getText().toString().trim());
                 int interval = Integer.parseInt(editInterval.getText().toString().trim());
-                int xOffset = Integer.parseInt(editX.getText().toString().trim());
-                int yOffset = Integer.parseInt(editY.getText().toString().trim());
-                int zOffset = Integer.parseInt(editZ.getText().toString().trim());
-
-                AccelConfig config = new AccelConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
+                PpgConfig config = new PpgConfig(3, interval, true);
                 byte[] data = config.toHexByte();
 
                 BleManager.getInstance().write(
@@ -126,5 +116,3 @@ public class AccelConfigFragment extends DialogFragment {
         });
     }
 }
-
-

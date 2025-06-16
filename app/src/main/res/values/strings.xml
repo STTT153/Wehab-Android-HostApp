@@ -39,8 +39,7 @@
     <string name="enter">进入操作</string>
 
     <string name="PPG">PPG数据</string>>
-    <string name="acceleration">加速度数据</string>>
-    <string name="gyro">陀螺仪数据</string>
+    <string name="acceleration">加速度陀螺仪传感器数据</string>>
 
     <string name="btn_save_data">保存数据</string>>
     <string name="btn_stop_notify">停止通知</string>>

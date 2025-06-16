@@ -17,7 +17,7 @@
             android:id="@+id/toolbar2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="@color/light_gray"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme" />
 
@@ -32,12 +32,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/acceleration" />
-
-        <Button
-            android:id="@+id/btn_gyro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/gyro" />
 
         <FrameLayout
             android:id="@+id/config_container"
