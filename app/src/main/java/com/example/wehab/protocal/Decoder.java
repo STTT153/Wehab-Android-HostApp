@@ -1,80 +1,28 @@
 package com.example.wehab.protocal;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
+
+import com.clj.fastble.utils.HexUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class Decoder {
     public static String decode(byte[] data) {
-        String rtn;
         if (data == null || data.length < 8) return "数据无效";
-
         byte type = data[3];
-
         switch (type) {
             case 0x01:
-                // Log.d("Accel Raw Data", HexUtil.formatHexString(data, true));
+                Log.d("Accel Raw Data", HexUtil.formatHexString(data, true));
                 return decodeAccel(data);
             case 0x02:
                 return decodeGyro(data);
-            case 3:
-                rtn = "地磁传感器数据";
-                break;
-            case 4:
+            case 0x04:
                 return decodePpg(data);
-            case 5:
-                rtn = "血氧PPG";
-                break;
-            case 7:
-                rtn = "温度传感器数据";
-                break;
-            case 8:
-                rtn = "环境光感数据";
-                break;
-            case 9:
-                if (data[10] == 1) rtn = "正在佩戴";
-                else rtn = "未佩戴";
-                break;
-            case 10:
-            case 42:
-                rtn = "心率数据上传，备份数据上传";
-                break;
-            case 11:
-            case 43:
-                rtn = "当前血氧：" + data[10] + "%";
-                break;
-            case 12:
-            case 50:
-                rtn = "呼吸率测量结果";
-                break;
-
-            case 16:
-                rtn = "计步器数据";
-                break;
-            case 17:
-                rtn = "睡眠数据";
-                break;
-            case 19:
-                rtn = "睡眠质量检测";
-                break;
-            case 21:
-                if (data[10] == 2) rtn = "非活体佩戴";
-                else rtn = "活体佩戴";
-                break;
-            case 22:
-                rtn = "压力测量结果";
-                break;
-            case 32:
-                rtn = "用户操作记录";
-                break;
-            case 33:
-                rtn = "设备电量";
-                break;
             default:
-                rtn = "其他指令";
+                return "其他指令";
         }
-        return rtn;
     }
 
     private static boolean verifyChecksum(byte[] data) {
@@ -129,6 +77,10 @@ public class Decoder {
             float y = buffer.getFloat(offset + 4);
             float z = buffer.getFloat(offset + 8);
 
+            Log.d("Data read by getFloat", "x: "+ HexUtil.formatHexString(dbgFunc(offset, 4, buffer), true) + " float: " + Float.toString(x));
+            Log.d("Data read by getFloat", "y: "+ HexUtil.formatHexString(dbgFunc(offset+4, 4, buffer), true) + " float: " + Float.toString(y));
+            Log.d("Data read by getFloat", "z: "+ HexUtil.formatHexString(dbgFunc(offset+8, 4, buffer), true) + " float: " + Float.toString(z));
+
             result.append(String.format("Accel[%d] x=%.3f, y=%.3f, z=%.3f g\n", i, x, y, z));
             offset += 12;
             i++;
@@ -138,6 +90,13 @@ public class Decoder {
         result.append("结束偏移位置: ").append(offset).append(" / 总长度: ").append(data.length).append("\n");
 
         return result.toString();
+    }
+
+    private static byte[] dbgFunc(int offset, int length, ByteBuffer buffer){
+        byte[] sliceBytes = new byte[length];
+        buffer.position(offset);
+        buffer.get(sliceBytes, 0, length);
+        return sliceBytes;
     }
 
     private static String decodeGyro(byte[] data) {

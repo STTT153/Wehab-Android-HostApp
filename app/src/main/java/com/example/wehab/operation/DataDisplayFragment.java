@@ -1,5 +1,6 @@
 package com.example.wehab.operation;
 import static com.example.wehab.protocal.Protocal.UUID_CHARACTERISTIC_NOTIFY;
+import static com.example.wehab.protocal.Protocal.UUID_CHARACTERISTIC_WRITE;
 import static com.example.wehab.protocal.Protocal.UUID_SERVICE;
 
 import androidx.annotation.Nullable;
@@ -20,10 +21,12 @@ import android.os.Bundle;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleNotifyCallback;
+import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 
 import com.example.wehab.R;
+import com.example.wehab.protocal.AccelConfig;
 import com.example.wehab.protocal.Decoder;
 import com.example.wehab.util.DownloadData;
 

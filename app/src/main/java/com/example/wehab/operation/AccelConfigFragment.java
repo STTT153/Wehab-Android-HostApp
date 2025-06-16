@@ -3,6 +3,7 @@ import static com.example.wehab.protocal.Protocal.UUID_CHARACTERISTIC_WRITE;
 import static com.example.wehab.protocal.Protocal.UUID_SERVICE;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.BleManager;
 
 import com.clj.fastble.exception.BleException;
+import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
 
@@ -87,6 +89,7 @@ public class AccelConfigFragment extends DialogFragment {
 
                 AccelConfig config = new AccelConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
                 byte[] data = config.toHexByte();
+                Log.d("inst", HexUtil.formatHexString(data, true));
 
                 BleManager.getInstance().write(
                         bleDevice,

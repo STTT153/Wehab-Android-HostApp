@@ -37,7 +37,7 @@ public class PpgConfigFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_accel_config, container, false);
+        return inflater.inflate(R.layout.fragment_ppg_config, container, false);
     }
 
     @Override

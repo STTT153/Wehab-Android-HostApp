@@ -32,7 +32,6 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v){
         int id = v.getId();
-
         if (id == R.id.btn_acc){
             // 启动 AccelConfigFragment 页面
             AccelConfigFragment fragment = new AccelConfigFragment();
@@ -43,10 +42,16 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             Bundle bundle = new Bundle();
             bundle.putParcelable(KEY_DATA, bleDevice);
             fragment.setArguments(bundle);
-
-
         }else if (id == R.id.btn_ppg) {
-            Log.d("button", "button ppg clicked.");
+            // 启动 PpgConfigFragment 页面
+            PpgConfigFragment fragment = new PpgConfigFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.config_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(KEY_DATA, bleDevice);
+            fragment.setArguments(bundle);
         }
     }
 
@@ -54,16 +59,15 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             FragmentManager fm = getSupportFragmentManager();
-            Fragment currentFragment = fm.findFragmentById(R.id.data_display_container); // 你的 Fragment 容器 ID
+            Fragment currentFragment = fm.findFragmentById(R.id.data_display_container);
 
             if (currentFragment instanceof DataDisplayFragment) {
                 Log.d("Back", "Back from fragment, popBackStack");
                 fm.popBackStack(); // 返回上一层 Fragment
             } else {
-                Log.d("Back", "Back from activity, finish");
+                Log.d("Operation Activity finish", "back btn clicked in operation activity");
                 finish(); // 回到 MainActivity
             }
-
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -73,11 +77,12 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         Toolbar toolbar = findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setTitle("获取数据");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // 显示箭头
-        getSupportActionBar().setHomeButtonEnabled(true);      // 启用点击事件
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         Button btnPpg = findViewById(R.id.btn_ppg);
         btnPpg.setOnClickListener(this);
+
         Button btnAcc = findViewById(R.id.btn_acc);
         btnAcc.setOnClickListener(this);
     }
@@ -85,6 +90,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     private void initData(){
         // 获取对应的bleDevice
         bleDevice = getIntent().getParcelableExtra(KEY_DATA);
-        if (bleDevice == null) {finish();}
+        if (bleDevice == null) {
+            Log.d("Operation Activity Finish", "bleDevice is null");
+            finish();}
     }
 }
