@@ -20,6 +20,7 @@ import com.clj.fastble.BleManager;
 
 import com.clj.fastble.exception.BleException;
 import com.example.wehab.R;
+import com.example.wehab.protocal.AccelConfig;
 import com.example.wehab.protocal.PpgConfig;
 
 public class PpgConfigFragment extends DialogFragment {
@@ -86,12 +87,12 @@ public class PpgConfigFragment extends DialogFragment {
                         new BleWriteCallback() {
                             @Override
                             public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                android.widget.Toast.makeText(getContext(), "发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                android.widget.Toast.makeText(getContext(), "配置ppg指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onWriteFailure(BleException exception) {
-                                android.widget.Toast.makeText(getContext(), "发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
+                                android.widget.Toast.makeText(getContext(), "配置ppg指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
                             }
                         });
 

@@ -16,8 +16,8 @@ public class PpgConfig {
         byte[] data = new byte[7]; // 6字节内容 + 1字节校验和
 
         // 1. Sync (2 bytes)
-        data[0] = (byte) 0xA5;
-        data[1] = (byte) 0x5A;
+        data[0] = (byte) 0x5A;
+        data[1] = (byte) 0xA5;
 
         // 2. Len (1 byte)
         data[2] = 0x05;

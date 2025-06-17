@@ -99,14 +99,16 @@ public class AccelConfigFragment extends DialogFragment {
                         new BleWriteCallback() {
                             @Override
                             public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                android.widget.Toast.makeText(getContext(), "发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                android.widget.Toast.makeText(getContext(), "配置sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onWriteFailure(BleException exception) {
-                                android.widget.Toast.makeText(getContext(), "发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
+                                android.widget.Toast.makeText(getContext(), "配置sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
                             }
                         });
+
+
 
                 // 切换显示的容器
                 requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.GONE);

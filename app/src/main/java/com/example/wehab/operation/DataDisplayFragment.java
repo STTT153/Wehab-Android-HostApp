@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleNotifyCallback;
@@ -25,6 +26,7 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 
+import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
 import com.example.wehab.protocal.Decoder;
@@ -82,6 +84,7 @@ public class DataDisplayFragment extends Fragment {
         requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.VISIBLE);
         requireActivity().findViewById(R.id.data_display_container).setVisibility(View.GONE);
         BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
+
     }
 
     private void addText(ScrollView scrollView, TextView textView, String content) {

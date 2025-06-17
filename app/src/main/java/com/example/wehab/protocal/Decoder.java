@@ -15,7 +15,7 @@ public class Decoder {
             case 0x01 -> decodeAccel(data);
             case 0x02 -> decodeGyro(data);
             case 0x04 -> decodePpg(data);
-            default -> "其他指令";
+            default -> HexUtil.formatHexString(data, true);
         };
     }
 
@@ -29,7 +29,7 @@ public class Decoder {
         return (checksum == data[data.length - 1]);
     }
     private static boolean isLengthValid(byte[] data){
-        int len = data[3] ;
+        int len = data[2] & 0xFF;
         return len + 3 == data.length;
     }
     private static boolean isDataValid(byte[] data){
@@ -117,19 +117,10 @@ public class Decoder {
         if (!isDataValid(data)) {
             return "inValid data";
         }
-
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+        StringBuilder result = new StringBuilder();
 
         int length = buffer.get(2) & 0xFF;
-        if (data.length != (length + 3)) { // Sync(2B) + Len(1B)
-            return "数据长度与长度字段不一致";
-        }
-
-        int type = buffer.get(3) & 0xFF;
-        if (type != 0x04) {
-            return "不是心率PPG数据类型";
-        }
-
         long seconds = buffer.getInt(4) & 0xFFFFFFFFL;
         int millis = buffer.getShort(8) & 0xFFFF;
         long timestampMs = seconds * 1000L + millis;
@@ -138,7 +129,7 @@ public class Decoder {
         int groupSize = 5; // 4 bytes data + 1 byte flag
         int groupCount = (length - 7) / groupSize; // 减去 type(1) + seconds(4) + millis(2)
 
-        StringBuilder result = new StringBuilder();
+
         result.append("心率 PPG 数据\n");
         result.append("时间戳(ms): ").append(timestampMs).append("\n");
         result.append("数据组数: ").append(groupCount).append("\n");
