@@ -28,7 +28,7 @@ import com.example.wehab.protocal.PpgConfig;
 
 import java.util.Objects;
 
-public class OperationActivity extends AppCompatActivity implements View.OnClickListener{
+public class OperationActivity extends AppCompatActivity implements View.OnClickListener, OnDataDisplayFragmentDestroyListener{
     public static final String KEY_DATA = "key_data";
     private BleDevice bleDevice;
 
@@ -68,43 +68,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onResume(){
         super.onResume();
-        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
-        byte[] inst1 = accelConfig.toHexByte();
-        BleManager.getInstance().write(
-                bleDevice,
-                UUID_SERVICE,
-                UUID_CHARACTERISTIC_WRITE,
-                inst1,
-                new BleWriteCallback() {
-                    @Override
-                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                        Log.d("inst", "停止发送accel命令到设备成功");
-                    }
-
-                    @Override
-                    public void onWriteFailure(BleException exception) {
-                        Log.d("inst", "停止发送accel命令到设备失败");
-                    }
-                });
-
-        PpgConfig ppgConfig = new PpgConfig(2, 5, false);
-        byte[] inst2 = ppgConfig.toHexByte();
-        BleManager.getInstance().write(
-                bleDevice,
-                UUID_SERVICE,
-                UUID_CHARACTERISTIC_WRITE,
-                inst2,
-                new BleWriteCallback() {
-                    @Override
-                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                        Log.d("inst", "停止发送ppg命令到设备成功");
-                    }
-
-                    @Override
-                    public void onWriteFailure(BleException exception) {
-                        Log.d("inst", "停止发送ppg命令到设备失败");
-                    }
-                });
+        stopRequiringData();
     }
 
     @Override
@@ -123,6 +87,12 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentDestroy(){
+        stopRequiringData();
+        switchVisibility();
     }
 
     private void initView(){
@@ -145,5 +115,45 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         if (bleDevice == null) {
             Log.d("Operation Activity Finish", "bleDevice is null");
             finish();}
+    }
+
+    private void stopRequiringData(){
+        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
+        byte[] inst1 = accelConfig.toHexByte();
+        PpgConfig ppgConfig = new PpgConfig(2, 5, false);
+        byte[] inst2 = ppgConfig.toHexByte();
+
+        BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
+                inst1,
+                new BleWriteCallback() {
+                    @Override
+                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                        Log.d("inst", "accel写成功，准备写ppg");
+
+                        BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
+                                inst2,
+                                new BleWriteCallback() {
+                                    @Override
+                                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                        Log.d("inst", "ppg写成功");
+                                    }
+
+                                    @Override
+                                    public void onWriteFailure(BleException exception) {
+                                        Log.d("inst", "ppg写失败: " + exception.toString());
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onWriteFailure(BleException exception) {
+                        Log.d("inst", "accel写失败: " + exception.toString());
+                    }
+                });
+
+    }
+    private void switchVisibility(){
+        findViewById(R.id.main_ui_container).setVisibility(View.VISIBLE);
+        findViewById(R.id.data_display_container).setVisibility(View.GONE);
     }
 }

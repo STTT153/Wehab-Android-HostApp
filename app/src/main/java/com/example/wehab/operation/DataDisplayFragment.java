@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,14 +38,13 @@ import java.util.Objects;
 
 public class DataDisplayFragment extends Fragment {
     private static final String KEY_DATA = "key_data";
-    private OnDataDisplayFragmentDestroyListener listner;
+    private OnDataDisplayFragmentDestroyListener listener;
     private BleDevice bleDevice;
     private Button btnSaveData;
     private Button btnStopNotify;
     private Toolbar toolbar;
     private TextView txt;
     private ScrollView scrollView;
-
 
     public DataDisplayFragment() {}
 
@@ -83,63 +83,17 @@ public class DataDisplayFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentDestroyedListener) {
-            listener = (OnFragmentDestroyedListener) context;
+        if (context instanceof OnDataDisplayFragmentDestroyListener) {
+            listener = (OnDataDisplayFragmentDestroyListener) context;
         } else {
             throw new RuntimeException(context.toString() + " must implement OnFragmentDestroyedListener");
         }
     }
-
-    /*
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.VISIBLE);
-        requireActivity().findViewById(R.id.data_display_container).setVisibility(View.GONE);
+    public void onPause() {
+        super.onPause();
         BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
-        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
-        byte[] inst1 = accelConfig.toHexByte();
-        BleManager.getInstance().write(
-                bleDevice,
-                UUID_SERVICE,
-                UUID_CHARACTERISTIC_WRITE,
-                inst1,
-                new BleWriteCallback() {
-                    @Override
-                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                        Log.d("inst", "停止发送accel命令到设备成功");
-                    }
-
-                    @Override
-                    public void onWriteFailure(BleException exception) {
-                        Log.d("inst", "停止发送accel命令到设备失败");
-                    }
-                });
-
-        PpgConfig ppgConfig = new PpgConfig(2, 5, false);
-        byte[] inst2 = ppgConfig.toHexByte();
-        BleManager.getInstance().write(
-                bleDevice,
-                UUID_SERVICE,
-                UUID_CHARACTERISTIC_WRITE,
-                inst2,
-                new BleWriteCallback() {
-                    @Override
-                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                        Log.d("inst", "停止发送ppg命令到设备成功");
-                    }
-
-                    @Override
-                    public void onWriteFailure(BleException exception) {
-                        Log.d("inst", "停止发送ppg命令到设备失败");
-                    }
-                });
-    }
-     */
-
-    @Override
-    public void onDestroyView(){
-
+        listener.onFragmentDestroy();
     }
 
     private void addText(ScrollView scrollView, TextView textView, String content) {
@@ -175,7 +129,6 @@ public class DataDisplayFragment extends Fragment {
             }
         });
     }
-
     private void setUpToolbar() {
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         activity.setSupportActionBar(toolbar);
