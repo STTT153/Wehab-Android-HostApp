@@ -30,12 +30,14 @@ import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
 import com.example.wehab.protocal.Decoder;
+import com.example.wehab.protocal.PpgConfig;
 import com.example.wehab.util.DownloadData;
 
 import java.util.Objects;
 
 public class DataDisplayFragment extends Fragment {
     private static final String KEY_DATA = "key_data";
+    private OnDataDisplayFragmentDestroyListener listner;
     private BleDevice bleDevice;
     private Button btnSaveData;
     private Button btnStopNotify;
@@ -79,11 +81,64 @@ public class DataDisplayFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentDestroyedListener) {
+            listener = (OnFragmentDestroyedListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentDestroyedListener");
+        }
+    }
+
+    /*
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.VISIBLE);
         requireActivity().findViewById(R.id.data_display_container).setVisibility(View.GONE);
         BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
+        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
+        byte[] inst1 = accelConfig.toHexByte();
+        BleManager.getInstance().write(
+                bleDevice,
+                UUID_SERVICE,
+                UUID_CHARACTERISTIC_WRITE,
+                inst1,
+                new BleWriteCallback() {
+                    @Override
+                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                        Log.d("inst", "停止发送accel命令到设备成功");
+                    }
+
+                    @Override
+                    public void onWriteFailure(BleException exception) {
+                        Log.d("inst", "停止发送accel命令到设备失败");
+                    }
+                });
+
+        PpgConfig ppgConfig = new PpgConfig(2, 5, false);
+        byte[] inst2 = ppgConfig.toHexByte();
+        BleManager.getInstance().write(
+                bleDevice,
+                UUID_SERVICE,
+                UUID_CHARACTERISTIC_WRITE,
+                inst2,
+                new BleWriteCallback() {
+                    @Override
+                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                        Log.d("inst", "停止发送ppg命令到设备成功");
+                    }
+
+                    @Override
+                    public void onWriteFailure(BleException exception) {
+                        Log.d("inst", "停止发送ppg命令到设备失败");
+                    }
+                });
+    }
+     */
+
+    @Override
+    public void onDestroyView(){
 
     }
 

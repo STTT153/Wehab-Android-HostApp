@@ -47,7 +47,6 @@ public class AccelConfigFragment extends DialogFragment {
         initView(view);
         initData();
         setUpListeners();
-
     }
 
     @Override
@@ -100,11 +99,13 @@ public class AccelConfigFragment extends DialogFragment {
                             @Override
                             public void onWriteSuccess(int current, int total, byte[] justWrite) {
                                 android.widget.Toast.makeText(getContext(), "配置sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                Log.d("inst", "发送accel指令到设备成功");
                             }
 
                             @Override
                             public void onWriteFailure(BleException exception) {
                                 android.widget.Toast.makeText(getContext(), "配置sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
+                                Log.d("inst", "发送accel指令到设备成功");
                             }
                         });
 

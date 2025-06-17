@@ -1,5 +1,8 @@
 package com.example.wehab.operation;
 
+import static com.example.wehab.protocal.Protocal.UUID_CHARACTERISTIC_WRITE;
+import static com.example.wehab.protocal.Protocal.UUID_SERVICE;
+
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,13 +10,21 @@ import android.util.Log;
 import android.view.View;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 
+import com.clj.fastble.exception.BleException;
+import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
+import com.example.wehab.protocal.AccelConfig;
+import com.example.wehab.protocal.PpgConfig;
 
 import java.util.Objects;
 
@@ -53,6 +64,47 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             bundle.putParcelable(KEY_DATA, bleDevice);
             fragment.setArguments(bundle);
         }
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
+        byte[] inst1 = accelConfig.toHexByte();
+        BleManager.getInstance().write(
+                bleDevice,
+                UUID_SERVICE,
+                UUID_CHARACTERISTIC_WRITE,
+                inst1,
+                new BleWriteCallback() {
+                    @Override
+                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                        Log.d("inst", "停止发送accel命令到设备成功");
+                    }
+
+                    @Override
+                    public void onWriteFailure(BleException exception) {
+                        Log.d("inst", "停止发送accel命令到设备失败");
+                    }
+                });
+
+        PpgConfig ppgConfig = new PpgConfig(2, 5, false);
+        byte[] inst2 = ppgConfig.toHexByte();
+        BleManager.getInstance().write(
+                bleDevice,
+                UUID_SERVICE,
+                UUID_CHARACTERISTIC_WRITE,
+                inst2,
+                new BleWriteCallback() {
+                    @Override
+                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                        Log.d("inst", "停止发送ppg命令到设备成功");
+                    }
+
+                    @Override
+                    public void onWriteFailure(BleException exception) {
+                        Log.d("inst", "停止发送ppg命令到设备失败");
+                    }
+                });
     }
 
     @Override

@@ -4,6 +4,7 @@ import static com.example.wehab.protocal.Protocal.UUID_CHARACTERISTIC_WRITE;
 import static com.example.wehab.protocal.Protocal.UUID_SERVICE;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.clj.fastble.exception.BleException;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
 import com.example.wehab.protocal.PpgConfig;
+
 
 public class PpgConfigFragment extends DialogFragment {
     // UI相关变量
@@ -88,11 +90,13 @@ public class PpgConfigFragment extends DialogFragment {
                             @Override
                             public void onWriteSuccess(int current, int total, byte[] justWrite) {
                                 android.widget.Toast.makeText(getContext(), "配置ppg指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                Log.d("inst", "发送ppg指令到设备成功");
                             }
 
                             @Override
                             public void onWriteFailure(BleException exception) {
                                 android.widget.Toast.makeText(getContext(), "配置ppg指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
+                                Log.d("inst", "发送ppg指令到设备失败");
                             }
                         });
 
