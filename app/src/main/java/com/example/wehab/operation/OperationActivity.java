@@ -81,6 +81,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 Log.d("Back", "Back from fragment, popBackStack");
                 fm.popBackStack(); // 返回上一层 Fragment
             } else {
+
                 Log.d("Operation Activity finish", "back btn clicked in operation activity");
                 finish(); // 回到 MainActivity
             }
@@ -91,7 +92,6 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onFragmentDestroy(){
-        stopRequiringData();
         switchVisibility();
     }
 
@@ -117,43 +117,45 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             finish();}
     }
 
+    private void switchVisibility(){
+        findViewById(R.id.main_ui_container).setVisibility(View.VISIBLE);
+        findViewById(R.id.data_display_container).setVisibility(View.GONE);
+    }
     private void stopRequiringData(){
         AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
         byte[] inst1 = accelConfig.toHexByte();
         PpgConfig ppgConfig = new PpgConfig(2, 5, false);
         byte[] inst2 = ppgConfig.toHexByte();
 
-        BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
-                inst1,
-                new BleWriteCallback() {
-                    @Override
-                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                        Log.d("inst", "accel写成功，准备写ppg");
+        if (BleManager.getInstance().isConnected(bleDevice)) {
+            BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
+                    inst1,
+                    new BleWriteCallback() {
+                        @Override
+                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                            Log.d("inst", "停止上传accel指令写成功");
+                        }
 
-                        BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
-                                inst2,
-                                new BleWriteCallback() {
-                                    @Override
-                                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                        Log.d("inst", "ppg写成功");
-                                    }
+                        @Override
+                        public void onWriteFailure(BleException exception) {
+                            Log.d("inst", "停止上传accel指令写失败 " + exception.toString());
+                        }
+                    });
+            BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
+                    inst2,
+                    new BleWriteCallback() {
+                        @Override
+                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                            Log.d("inst", "停止上传ppg指令写成功");
+                        }
 
-                                    @Override
-                                    public void onWriteFailure(BleException exception) {
-                                        Log.d("inst", "ppg写失败: " + exception.toString());
-                                    }
-                                });
-                    }
-
-                    @Override
-                    public void onWriteFailure(BleException exception) {
-                        Log.d("inst", "accel写失败: " + exception.toString());
-                    }
-                });
-
-    }
-    private void switchVisibility(){
-        findViewById(R.id.main_ui_container).setVisibility(View.VISIBLE);
-        findViewById(R.id.data_display_container).setVisibility(View.GONE);
+                        @Override
+                        public void onWriteFailure(BleException exception) {
+                            Log.d("inst", "停止上传ppg指令写失败: " + exception.toString());
+                        }
+                    });
+        } else {
+            Log.e("BLE", "设备未连接");
+        }
     }
 }

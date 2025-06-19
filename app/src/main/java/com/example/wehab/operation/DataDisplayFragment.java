@@ -125,6 +125,7 @@ public class DataDisplayFragment extends Fragment {
         btnStopNotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopRequiringData();
                 BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
             }
         });
@@ -135,7 +136,6 @@ public class DataDisplayFragment extends Fragment {
         Objects.requireNonNull(activity.getSupportActionBar()).setTitle("数据看板");
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-
     private void startNotify(){
         BleManager.getInstance().notify(
                 bleDevice,
@@ -162,5 +162,42 @@ public class DataDisplayFragment extends Fragment {
                         });
                     }
                 });
+    }
+    private void stopRequiringData(){
+        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
+        byte[] inst1 = accelConfig.toHexByte();
+        PpgConfig ppgConfig = new PpgConfig(2, 5, false);
+        byte[] inst2 = ppgConfig.toHexByte();
+
+        if (BleManager.getInstance().isConnected(bleDevice)) {
+            BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
+                    inst1,
+                    new BleWriteCallback() {
+                        @Override
+                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                            Log.d("inst", "停止上传accel指令写成功");
+                        }
+
+                        @Override
+                        public void onWriteFailure(BleException exception) {
+                            Log.d("inst", "停止上传accel指令写失败 " + exception.toString());
+                        }
+                    });
+            BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
+                    inst2,
+                    new BleWriteCallback() {
+                        @Override
+                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                            Log.d("inst", "停止上传ppg指令写成功");
+                        }
+
+                        @Override
+                        public void onWriteFailure(BleException exception) {
+                            Log.d("inst", "停止上传ppg指令写失败: " + exception.toString());
+                        }
+                    });
+        } else {
+            Log.e("BLE", "设备未连接");
+        }
     }
 }
