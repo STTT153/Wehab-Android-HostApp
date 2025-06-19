@@ -1,58 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/edit_range"
+    <!-- Range -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="输入量程 (例如 2, 4, 8, 16)G"
-        android:inputType="number" />
+        android:padding="8dp">
 
-    <EditText
-        android:id="@+id/edit_ord"
+        <TextView
+            android:id="@+id/txt_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_range"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/spinner_range"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:prompt="@string/hint_range"
+            app:layout_constraintStart_toEndOf="@id/txt_range"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ODR -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="输入ord(25, 50, 100, 200)"
-        android:inputType="number" />
+        android:padding="8dp">
 
-    <EditText
-        android:id="@+id/edit_interval"
-        android:hint="输入采样间隔 (ms)"
-        android:inputType="number"
+        <TextView
+            android:id="@+id/txt_odr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_odr"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Spinner
+            android:id="@+id/spinner_odr"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:prompt="@string/hint_odr"
+            app:layout_constraintStart_toEndOf="@id/txt_odr"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Interval -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
-    <EditText
-        android:id="@+id/edit_xoffset"
-        android:hint="x偏移量"
-        android:inputType="number"
+        <TextView
+            android:id="@+id/txt_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_interval"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Spinner
+            android:id="@+id/spinner_interval"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:prompt="@string/hint_interval"
+            app:layout_constraintStart_toEndOf="@id/txt_interval"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- X Offset -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
-    <EditText
-        android:id="@+id/edit_yoffset"
-        android:hint="y偏移量"
-        android:inputType="number"
+        <TextView
+            android:id="@+id/txt_xoffset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_xoffset"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Spinner
+            android:id="@+id/spinner_xoffset"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:prompt="@string/hint_xoffset"
+            app:layout_constraintStart_toEndOf="@id/txt_xoffset"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Y Offset -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
-    <EditText
-        android:id="@+id/edit_zoffset"
-        android:hint="z偏移量"
-        android:inputType="number"
+        <TextView
+            android:id="@+id/txt_yoffset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_yoffset"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Spinner
+            android:id="@+id/spinner_yoffset"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:prompt="@string/hint_yoffset"
+            app:layout_constraintStart_toEndOf="@id/txt_yoffset"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Z Offset -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
+        <TextView
+            android:id="@+id/txt_zoffset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_zoffset"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Spinner
+            android:id="@+id/spinner_zoffset"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:prompt="@string/hint_zoffset"
+            app:layout_constraintStart_toEndOf="@id/txt_zoffset"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Confirm Button -->
     <Button
         android:id="@+id/btn_confirm"
-        android:text="确认"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:text="@string/btn_confirm" />
 
 </LinearLayout>

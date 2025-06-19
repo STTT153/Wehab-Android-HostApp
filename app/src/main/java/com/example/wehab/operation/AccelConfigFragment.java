@@ -23,9 +23,13 @@ import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
 
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+
+
 public class AccelConfigFragment extends DialogFragment {
     // UI相关变量
-    private EditText editRange, editOrd, editInterval, editX, editY, editZ;
+    private Spinner spinnerRange, spinnerOdr, spinnerInterval, spinnerX, spinnerY, spinnerZ;
     private Button btnConfirm;
     // 业务逻辑相关变量
     public static final String KEY_DATA = "key_data";
@@ -61,13 +65,25 @@ public class AccelConfigFragment extends DialogFragment {
     }
 
     private void initView(View view){
-        editRange = view.findViewById(R.id.edit_range);
-        editOrd = view.findViewById(R.id.edit_ord);
-        editInterval = view.findViewById(R.id.edit_interval);
-        editX = view.findViewById(R.id.edit_xoffset);
-        editY = view.findViewById(R.id.edit_yoffset);
-        editZ = view.findViewById(R.id.edit_zoffset);
+        spinnerRange = view.findViewById(R.id.spinner_range);
+        spinnerOdr = view.findViewById(R.id.spinner_odr);
+        spinnerInterval = view.findViewById(R.id.spinner_interval);
+        spinnerX = view.findViewById(R.id.spinner_xoffset);
+        spinnerY = view.findViewById(R.id.spinner_yoffset);
+        spinnerZ = view.findViewById(R.id.spinner_zoffset);
+
         btnConfirm = view.findViewById(R.id.btn_confirm);
+
+        setUpSpinner(spinnerRange, new String[]{"2", "4", "8", "16"});
+        spinnerRange.setSelection(3);
+        setUpSpinner(spinnerOdr, new String[]{"200", "100", "50", "25"});
+        spinnerOdr.setSelection(0);
+        setUpSpinner(spinnerInterval, new String[]{"50", "100", "200"});
+        spinnerInterval.setSelection(2);
+
+        setUpSpinner(spinnerX, new String[]{"0", "1", "2", "3"});
+        setUpSpinner(spinnerY, new String[]{"0", "1", "2", "3"});
+        setUpSpinner(spinnerZ, new String[]{"0", "1", "2", "3"});
     }
 
     private void initData(){
@@ -76,15 +92,23 @@ public class AccelConfigFragment extends DialogFragment {
         }
     }
 
+    private void setUpSpinner(Spinner spinner, String[] items) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+
     private void setUpListeners(){
         btnConfirm.setOnClickListener(v -> {
             try {
-                int range = Integer.parseInt(editRange.getText().toString().trim());
-                int ord = Integer.parseInt(editOrd.getText().toString().trim());
-                int interval = Integer.parseInt(editInterval.getText().toString().trim());
-                int xOffset = Integer.parseInt(editX.getText().toString().trim());
-                int yOffset = Integer.parseInt(editY.getText().toString().trim());
-                int zOffset = Integer.parseInt(editZ.getText().toString().trim());
+                int range = Integer.parseInt(spinnerRange.getSelectedItem().toString());
+                int ord = Integer.parseInt(spinnerOdr.getSelectedItem().toString());
+                int interval = Integer.parseInt(spinnerInterval.getSelectedItem().toString());
+                int xOffset = Integer.parseInt(spinnerX.getSelectedItem().toString());
+                int yOffset = Integer.parseInt(spinnerY.getSelectedItem().toString());
+                int zOffset = Integer.parseInt(spinnerZ.getSelectedItem().toString());
 
                 AccelConfig config = new AccelConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
                 byte[] data = config.toHexByte();
