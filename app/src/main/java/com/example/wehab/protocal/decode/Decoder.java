@@ -1,21 +1,22 @@
-package com.example.wehab.protocal;
+package com.example.wehab.protocal.decode;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
+
 import com.clj.fastble.utils.HexUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import com.example.wehab.protocal.SensorType;
+
 public class Decoder {
-    public static String decode(byte[] data) {
-        if (data == null || data.length < 8) return "数据无效";
+    public static SensorData decode(byte[] data) {
         byte type = data[3];
         return switch (type) {
             case 0x01 -> decodeAccel(data);
             case 0x02 -> decodeGyro(data);
             case 0x04 -> decodePpg(data);
-            default -> HexUtil.formatHexString(data, true);
+            default -> null;
         };
     }
 
@@ -37,23 +38,20 @@ public class Decoder {
     }
 
     @SuppressLint("DefaultLocale")
-    private static String decodeAccel(byte[] data) {
+    private static SensorData decodeAccel(byte[] data) {
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-        StringBuilder result = new StringBuilder();
 
         int length = buffer.get(2) & 0xFF;
         long seconds = buffer.getInt(4) & 0xFFFFFFFFL;
         int millis = buffer.getShort(8) & 0xFFFF;
         long timestampMs = seconds * 1000L + millis;
         int accelGroupCount = (length - 8) / 12;
+        AccelData parsedData = new AccelData(SensorType.ACCEL, timestampMs, accelGroupCount);
 
         if (!isDataValid(data)) {
-            return "inValid data";
+            return null;
         }
 
-        result.append("加速度传感器数据\n");
-        result.append("时间戳(ms): ").append(timestampMs).append("\n");
-        result.append("加速度组数: ").append(accelGroupCount).append("\n");
         int i = 0;
         int offset = 10;
 
@@ -62,38 +60,30 @@ public class Decoder {
             float y = buffer.getFloat(offset + 4);
             float z = buffer.getFloat(offset + 8);
 
-            result.append(String.format("Accel[%d] x=%.3f, y=%.3f, z=%.3f g\n", i, x, y, z));
+            parsedData.setData(x, y, z);
             offset += 12;
             i++;
         }
-        result.append("实际解析组数: ").append(i).append("\n");
-        result.append("结束偏移位置: ").append(offset).append(" / 总长度: ").append(data.length).append("\n");
-        return result.toString();
+
+        return parsedData;
     }
 
-
     @SuppressLint("DefaultLocale")
-    private static String decodeGyro(byte[] data) {
+    private static SensorData decodeGyro(byte[] data) {
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-        StringBuilder result = new StringBuilder();
 
         int length = buffer.get(2) & 0xFF;
         long seconds = buffer.getInt(4) & 0xFFFFFFFFL;
         int millis = buffer.getShort(8) & 0xFFFF;
-        int imuStatus = buffer.get(10) & 0xFF;
         long timestampMs = seconds * 1000L + millis;
         int gyroGroupCount = (length - 8) / 12;
 
+        GyroData parsedData = new GyroData(SensorType.GYRO, timestampMs, gyroGroupCount);
+
         if (!isDataValid(data)) {
-            return "inValid data";
+            return null;
         }
 
-        result.append("陀螺仪传感器数据\n");
-        result.append("时间戳(ms): ").append(timestampMs).append("\n");
-        result.append("IMU状态: ").append(imuStatus == 1 ? "50Hz" : "12.5Hz").append("\n");
-        result.append("陀螺仪组数: ").append(gyroGroupCount).append("\n");
-
-        int i = 0;
         int offset = 10;
 
         while (offset + 12 <= data.length - 1) { // 不读到校验和字节
@@ -101,24 +91,19 @@ public class Decoder {
             float y = buffer.getFloat(offset + 4);
             float z = buffer.getFloat(offset + 8);
 
-            result.append(String.format("Gyro[%d] x=%.3f, y=%.3f, z=%.3f deg/s\n", i, x, y, z));
+            parsedData.setData(x, y, z);
+
             offset += 12;
-            i++;
         }
 
-        result.append("实际解析组数: ").append(i).append("\n");
-        result.append("结束偏移位置: ").append(offset).append(" / 总长度: ").append(data.length).append("\n");
-
-        return result.toString();
+        return parsedData;
     }
 
-
-    private static String decodePpg(byte[] data) {
+    private static SensorData decodePpg(byte[] data) {
         if (!isDataValid(data)) {
-            return "inValid data";
+            return null;
         }
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
-        StringBuilder result = new StringBuilder();
 
         int length = buffer.get(2) & 0xFF;
         long seconds = buffer.getInt(4) & 0xFFFFFFFFL;
@@ -126,31 +111,16 @@ public class Decoder {
         long timestampMs = seconds * 1000L + millis;
 
         int offset = 10;
-        int groupSize = 5; // 4 bytes data + 1 byte flag
-        int groupCount = (length - 7) / groupSize; // 减去 type(1) + seconds(4) + millis(2)
+        int groupCount = (length - 7) / 4;
 
+        PpgData parsedData = new PpgData(SensorType.PPG, timestampMs, groupCount);
 
-        result.append("心率 PPG 数据\n");
-        result.append("时间戳(ms): ").append(timestampMs).append("\n");
-        result.append("数据组数: ").append(groupCount).append("\n");
-
-        int i = 0;
-        while (offset + groupSize <= data.length - 1) { // 留出校验和
+        while (offset + 4 <= data.length - 1) { // 留出校验和
             long value = buffer.getInt(offset) & 0xFFFFFFFFL;
-            int flag = buffer.get(offset + 4) & 0xFF;
+            parsedData.setData(value);
 
-            result.append(String.format("PPG[%d] Value=%d, 调制=%s\n",
-                    i, value, flag == 1 ? "是" : "否"));
-
-            offset += groupSize;
-            i++;
+            offset += 4;
         }
-
-        result.append("实际解析组数: ").append(i).append("\n");
-        result.append("结束偏移位置: ").append(offset).append(" / 总长度: ").append(data.length).append("\n");
-
-        return result.toString();
+        return parsedData;
     }
-
-
 }

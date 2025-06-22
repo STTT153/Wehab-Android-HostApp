@@ -371,9 +371,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION
+        String[] permissions;
 
-        };
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+            };
+        }else {
+            permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+        }
+
         List<String> permissionDeniedList = new ArrayList<>();
         for (String permission : permissions) {
             int permissionCheck = ContextCompat.checkSelfPermission(this, permission);

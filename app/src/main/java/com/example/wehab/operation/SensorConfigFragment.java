@@ -1,4 +1,5 @@
 package com.example.wehab.operation;
+
 import static com.example.wehab.protocal.Protocal.UUID_CHARACTERISTIC_WRITE;
 import static com.example.wehab.protocal.Protocal.UUID_SERVICE;
 
@@ -22,27 +23,29 @@ import com.clj.fastble.exception.BleException;
 import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
+import com.example.wehab.protocal.PpgConfig;
 
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 
 
-public class AccelConfigFragment extends DialogFragment {
+public class SensorConfigFragment extends DialogFragment {
     // UI相关变量
     private Spinner spinnerRange, spinnerOdr, spinnerInterval, spinnerX, spinnerY, spinnerZ;
+    private EditText editInterval;
     private Button btnConfirm;
     // 业务逻辑相关变量
     public static final String KEY_DATA = "key_data";
     private BleDevice bleDevice;
 
-    public AccelConfigFragment() {}
+    public SensorConfigFragment() {}
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_accel_config, container, false);
+        return inflater.inflate(R.layout.fragment_sensor_config, container, false);
     }
 
     @Override
@@ -71,6 +74,7 @@ public class AccelConfigFragment extends DialogFragment {
         spinnerX = view.findViewById(R.id.spinner_xoffset);
         spinnerY = view.findViewById(R.id.spinner_yoffset);
         spinnerZ = view.findViewById(R.id.spinner_zoffset);
+        editInterval = view.findViewById(R.id.edit_interval);
 
         btnConfirm = view.findViewById(R.id.btn_confirm);
 
@@ -79,7 +83,7 @@ public class AccelConfigFragment extends DialogFragment {
         setUpSpinner(spinnerOdr, new String[]{"200", "100", "50", "25"});
         spinnerOdr.setSelection(0);
         setUpSpinner(spinnerInterval, new String[]{"50", "100", "200"});
-        spinnerInterval.setSelection(2);
+        spinnerInterval.setSelection(1);
 
         setUpSpinner(spinnerX, new String[]{"0", "1", "2", "3"});
         setUpSpinner(spinnerY, new String[]{"0", "1", "2", "3"});
@@ -109,31 +113,50 @@ public class AccelConfigFragment extends DialogFragment {
                 int xOffset = Integer.parseInt(spinnerX.getSelectedItem().toString());
                 int yOffset = Integer.parseInt(spinnerY.getSelectedItem().toString());
                 int zOffset = Integer.parseInt(spinnerZ.getSelectedItem().toString());
+                int ppgInterval = Integer.parseInt(editInterval.getText().toString().trim());
 
-                AccelConfig config = new AccelConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
-                byte[] data = config.toHexByte();
-                Log.d("inst", HexUtil.formatHexString(data, true));
+                AccelConfig accelConfig = new AccelConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
+                byte[] inst1 = accelConfig.toHexByte();
+
+                PpgConfig ppgConfig = new PpgConfig(3, ppgInterval, true);
+                byte[] inst2 = ppgConfig.toHexByte();
 
                 BleManager.getInstance().write(
                         bleDevice,
                         UUID_SERVICE,
                         UUID_CHARACTERISTIC_WRITE,
-                        data,
+                        inst1,
                         new BleWriteCallback() {
                             @Override
                             public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                android.widget.Toast.makeText(getContext(), "配置sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                android.widget.Toast.makeText(getContext(), "配置accel sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
                                 Log.d("inst", "发送accel指令到设备成功");
                             }
 
                             @Override
                             public void onWriteFailure(BleException exception) {
-                                android.widget.Toast.makeText(getContext(), "配置sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
+                                android.widget.Toast.makeText(getContext(), "配置accel sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
                                 Log.d("inst", "发送accel指令到设备成功");
                             }
                         });
+                BleManager.getInstance().write(
+                        bleDevice,
+                        UUID_SERVICE,
+                        UUID_CHARACTERISTIC_WRITE,
+                        inst2,
+                        new BleWriteCallback() {
+                            @Override
+                            public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                Log.d("inst", "发送ppg指令到设备成功");
+                            }
 
-
+                            @Override
+                            public void onWriteFailure(BleException exception) {
+                                android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
+                                Log.d("inst", "发送ppg指令到设备成功");
+                            }
+                        });
 
                 // 切换显示的容器
                 requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.GONE);
@@ -156,5 +179,6 @@ public class AccelConfigFragment extends DialogFragment {
         });
     }
 }
+
 
 

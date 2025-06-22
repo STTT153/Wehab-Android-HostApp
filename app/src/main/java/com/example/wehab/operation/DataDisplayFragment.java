@@ -16,10 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.Button;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleNotifyCallback;
@@ -27,11 +25,12 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 
-import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
-import com.example.wehab.protocal.Decoder;
 import com.example.wehab.protocal.PpgConfig;
+import com.example.wehab.protocal.SensorType;
+import com.example.wehab.protocal.decode.Decoder;
+import com.example.wehab.protocal.decode.SensorData;
 import com.example.wehab.util.DownloadData;
 
 import java.util.Objects;
@@ -40,11 +39,11 @@ public class DataDisplayFragment extends Fragment {
     private static final String KEY_DATA = "key_data";
     private OnDataDisplayFragmentDestroyListener listener;
     private BleDevice bleDevice;
-    private Button btnSaveData;
-    private Button btnStopNotify;
+    private Button btnSaveData, btnStopNotify;
     private Toolbar toolbar;
-    private TextView txt;
-    private ScrollView scrollView;
+    private TextView accelX, accelY, accelZ;
+    private TextView gyroX, gyroY, gyroZ;
+    private TextView ppg1, ppg2, ppg3;
 
     public DataDisplayFragment() {}
 
@@ -96,9 +95,23 @@ public class DataDisplayFragment extends Fragment {
         listener.onFragmentDestroy();
     }
 
-    private void addText(ScrollView scrollView, TextView textView, String content) {
-        textView.append(content + "\n");
-        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+    private void updateSensorDisplay(byte[] data){
+        SensorData parsedData = Decoder.decode(data);
+        if (parsedData != null){
+            SensorType sensorType = parsedData.getSensorType();
+           switch (sensorType){
+               case GYRO:
+                   gyroX.setText(String.format("%.2f",parsedData.getFirstData()[0]));
+                   gyroY.setText(String.format("%.2f",parsedData.getFirstData()[1]));
+                   gyroZ.setText(String.format("%.2f",parsedData.getFirstData()[2]));
+               case ACCEL:
+                   accelX.setText(String.format("%.2f",parsedData.getFirstData()[0]));
+                   accelY.setText(String.format("%.2f",parsedData.getFirstData()[1]));
+                   accelZ.setText(String.format("%.2f",parsedData.getFirstData()[2]));
+               case PPG:
+                   ppg1.setText(String.format("%.2f",parsedData.getFirstData()[0]));
+           }
+        }
     }
 
     private void runOnUiThread(Runnable runnable) {
@@ -107,8 +120,18 @@ public class DataDisplayFragment extends Fragment {
     }
 
     private void initView(View view){
-        txt = view.findViewById(R.id.tv_display);
-        scrollView = view.findViewById(R.id.scroll_view);
+        accelX = view.findViewById(R.id.accel_x);
+        accelY = view.findViewById(R.id.accel_y);
+        accelZ = view.findViewById(R.id.accel_z);
+
+        gyroX = view.findViewById(R.id.gyro_x);
+        gyroY = view.findViewById(R.id.gyro_y);
+        gyroZ = view.findViewById(R.id.gyro_z);
+
+        ppg1 = view.findViewById(R.id.ppg_1);
+        ppg2 = view.findViewById(R.id.ppg_2);
+        ppg3 = view.findViewById(R.id.ppg_3);
+
         btnSaveData = view.findViewById(R.id.btn_save_data);
         btnStopNotify = view.findViewById(R.id.btn_stop_notify);
         toolbar = view.findViewById(R.id.toolbar3);
@@ -118,8 +141,10 @@ public class DataDisplayFragment extends Fragment {
         btnSaveData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 String content = txt.getText().toString(); // 获取 TextView 中的文本内容
                 DownloadData.saveStringToCSV("downloaded data", content, getContext());
+                 */
             }
         });
         btnStopNotify.setOnClickListener(new View.OnClickListener() {
@@ -157,7 +182,7 @@ public class DataDisplayFragment extends Fragment {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                addText(scrollView, txt, Decoder.decode(data));
+                                updateSensorDisplay(data);
                             }
                         });
                     }

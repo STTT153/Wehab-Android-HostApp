@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -21,7 +20,6 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 
 import com.clj.fastble.exception.BleException;
-import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
 import com.example.wehab.protocal.PpgConfig;
@@ -43,19 +41,10 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v){
         int id = v.getId();
-        if (id == R.id.btn_acc){
-            // 启动 AccelConfigFragment 页面
-            AccelConfigFragment fragment = new AccelConfigFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.config_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(KEY_DATA, bleDevice);
-            fragment.setArguments(bundle);
-        }else if (id == R.id.btn_ppg) {
-            // 启动 PpgConfigFragment 页面
-            PpgConfigFragment fragment = new PpgConfigFragment();
+
+        if (id == R.id.btn_start) {
+            // 启动 SensorConfigFragment 页面
+            SensorConfigFragment fragment = new SensorConfigFragment();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.config_container, fragment)
                     .addToBackStack(null)
@@ -102,11 +91,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        Button btnPpg = findViewById(R.id.btn_ppg);
-        btnPpg.setOnClickListener(this);
-
-        Button btnAcc = findViewById(R.id.btn_acc);
-        btnAcc.setOnClickListener(this);
+        Button btnStart = findViewById(R.id.btn_start);
+        btnStart.setOnClickListener(this);
     }
 
     private void initData(){

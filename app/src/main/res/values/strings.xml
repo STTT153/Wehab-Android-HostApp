@@ -38,17 +38,17 @@
     <string name="disconnect">断开连接</string>
     <string name="enter">进入操作</string>
 
-    <string name="PPG">PPG数据</string>>
-    <string name="acceleration">加速度陀螺仪传感器数据</string>>
+    <string name="start">开始获取数据数据</string>>
 
     <string name="btn_save_data">保存数据</string>>
     <string name="btn_stop_notify">停止通知</string>>
     <string name="btn_confirm">确定</string>>
+    <string name="txt_ppg_interval">ppg发送间隔:</string>>
 
     <string name="hint_range">量程(G):</string>>
     <string name="hint_odr">ODR:</string>>
     <string name="hint_interval">间隔(ms):</string>>
-    <string name="hint_xoffset">x轴偏移量</string>>
-    <string name="hint_yoffset">y轴偏移量</string>>
-    <string name="hint_zoffset">z轴偏移量</string>>
+    <string name="hint_xoffset">x轴偏移量:</string>>
+    <string name="hint_yoffset">y轴偏移量:</string>>
+    <string name="hint_zoffset">z轴偏移量:</string>>
 </resources>

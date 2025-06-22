@@ -169,6 +169,34 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/txt_ppg_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/txt_ppg_interval"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <EditText
+            android:id="@+id/edit_interval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="输入采样间隔 5-60 (s)"
+            android:inputType="number"
+            app:layout_constraintTop_toTopOf="@id/txt_ppg_interval"
+            app:layout_constraintBottom_toBottomOf="@id/txt_ppg_interval"
+            app:layout_constraintStart_toEndOf="@id/txt_ppg_interval" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
     <!-- Confirm Button -->
     <Button
         android:id="@+id/btn_confirm"

@@ -22,16 +22,10 @@
             android:theme="?attr/actionBarTheme" />
 
         <Button
-            android:id="@+id/btn_ppg"
+            android:id="@+id/btn_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/PPG" />
-
-        <Button
-            android:id="@+id/btn_acc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/acceleration" />
+            android:text="@string/start" />
 
         <FrameLayout
             android:id="@+id/config_container"
