@@ -42,7 +42,7 @@ public class GyroData extends SensorData {
         result.append("时间戳：").append(this.timestamp).append("\n");
         result.append("数据组数：").append(this.groupCount).append("\n");
         for (int i = 0; i < groupCount; i++){
-            result.append("X: ").append(gyroX[i]).append("Y: ").append(gyroY[i]).append("Z: ").append(gyroZ[i]).append("\n");
+            result.append("X: ").append(gyroX[i]).append(", Y: ").append(gyroY[i]).append(", Z: ").append(gyroZ[i]).append("\n");
         }
         return result.toString();
     }

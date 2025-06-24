@@ -1,6 +1,7 @@
 package com.example.wehab.protocal.decode;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
 import com.clj.fastble.utils.HexUtil;
 

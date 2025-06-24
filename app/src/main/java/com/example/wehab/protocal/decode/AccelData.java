@@ -42,7 +42,7 @@ public class AccelData extends SensorData {
         result.append("时间戳：").append(this.timestamp).append("\n");
         result.append("数据组数：").append(this.groupCount).append("\n");
         for (int i = 0; i < groupCount; i++) {
-            result.append("X: ").append(accelX[i]).append("Y: ").append(accelY[i]).append("Z: ").append(accelZ[i]).append("\n");
+            result.append("X: ").append(accelX[i]).append(", Y: ").append(accelY[i]).append(", Z: ").append(accelZ[i]).append("\n");
         }
         return result.toString();
     }

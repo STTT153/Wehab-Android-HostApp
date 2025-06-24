@@ -3,13 +3,17 @@ package com.example.wehab.protocal;
 public class PpgConfig {
     // 心率PPG配置字段
     private int mode;            // 测量模式：0~6
-    private int intervalMinutes; // 定时测量时间间隔：5~60分钟
+    private int interval;        // 定时测量时间间隔：5~60分钟
     private boolean enabled;     // 开关
 
-    public PpgConfig(int mode, int intervalMinutes, boolean enabled) {
+    public PpgConfig(int mode, int interval, boolean enabled) {
         this.mode = mode;
-        this.intervalMinutes = intervalMinutes;
+        this.interval = interval;
         this.enabled = enabled;
+    }
+
+    public boolean isIntervalValid(){
+        return this.interval >= 5 && this.interval <= 60;
     }
 
     public byte[] toHexByte() {
@@ -29,7 +33,7 @@ public class PpgConfig {
         data[4] = (byte) (mode & 0xFF);
 
         // 5. 定时测量时间间隔 (1 byte)
-        data[5] = (byte) (intervalMinutes & 0xFF);
+        data[5] = (byte) (interval & 0xFF);
 
         // 6. 开关 (1 byte)
         data[6] = (byte) (enabled ? 1 : 0);

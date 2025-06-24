@@ -156,9 +156,10 @@
                 android:layout_height="wrap_content"
                 android:text="保存数据" />
 
-            <Button android:id="@+id/btn_stop_notify"
+            <Button
+                android:id="@+id/btn_swtich_notify_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="停止接收" />
+                android:text="@string/btn_switch_notify_state" />
         </LinearLayout>
 </LinearLayout>

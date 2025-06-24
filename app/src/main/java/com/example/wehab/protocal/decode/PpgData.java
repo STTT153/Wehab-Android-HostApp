@@ -32,11 +32,11 @@ public class PpgData extends SensorData {
     @Override
     public String toString(){
         StringBuilder result = new StringBuilder();
-        result.append("加速度传感器\n");
+        result.append("ppg传感器\n");
         result.append("时间戳：").append(this.timestamp).append("\n");
         result.append("数据组数：").append(this.groupCount).append("\n");
         for (int i = 0; i < groupCount; i++){
-            result.append("X: ").append(data[i]).append("\n1");
+            result.append("X: ").append(data[i]).append("\n");
         }
         return result.toString();
     }

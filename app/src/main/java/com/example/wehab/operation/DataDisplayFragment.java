@@ -25,6 +25,7 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 
+import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
 import com.example.wehab.protocal.AccelConfig;
 import com.example.wehab.protocal.PpgConfig;
@@ -44,6 +45,9 @@ public class DataDisplayFragment extends Fragment {
     private TextView accelX, accelY, accelZ;
     private TextView gyroX, gyroY, gyroZ;
     private TextView ppg1, ppg2, ppg3;
+    private boolean isNotifying = false;
+    private final StringBuilder txtBuilder = new StringBuilder();
+    private int count;
 
     public DataDisplayFragment() {}
 
@@ -76,7 +80,6 @@ public class DataDisplayFragment extends Fragment {
         initView(view);
         setUpListeners();
         setUpToolbar();
-        startNotify();
     }
 
     @Override
@@ -92,6 +95,7 @@ public class DataDisplayFragment extends Fragment {
     public void onPause() {
         super.onPause();
         BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
+        stopRequiringData(); // 建议加入这一行，确保传感器停止上传
         listener.onFragmentDestroy();
     }
 
@@ -101,15 +105,18 @@ public class DataDisplayFragment extends Fragment {
             SensorType sensorType = parsedData.getSensorType();
            switch (sensorType){
                case GYRO:
-                   gyroX.setText(String.format("%.2f",parsedData.getFirstData()[0]));
-                   gyroY.setText(String.format("%.2f",parsedData.getFirstData()[1]));
-                   gyroZ.setText(String.format("%.2f",parsedData.getFirstData()[2]));
+                   gyroX.setText(String.format("%.4f",parsedData.getFirstData()[0]));
+                   gyroY.setText(String.format("%.4f",parsedData.getFirstData()[1]));
+                   gyroZ.setText(String.format("%.4f",parsedData.getFirstData()[2]));
+                   break;
                case ACCEL:
-                   accelX.setText(String.format("%.2f",parsedData.getFirstData()[0]));
-                   accelY.setText(String.format("%.2f",parsedData.getFirstData()[1]));
-                   accelZ.setText(String.format("%.2f",parsedData.getFirstData()[2]));
+                   accelX.setText(String.format("%.4f",parsedData.getFirstData()[0]));
+                   accelY.setText(String.format("%.4f",parsedData.getFirstData()[1]));
+                   accelZ.setText(String.format("%.4f",parsedData.getFirstData()[2]));
+                   break;
                case PPG:
-                   ppg1.setText(String.format("%.2f",parsedData.getFirstData()[0]));
+                   ppg1.setText(String.format("%.4f",parsedData.getFirstData()[0]));
+                   break;
            }
         }
     }
@@ -133,7 +140,7 @@ public class DataDisplayFragment extends Fragment {
         ppg3 = view.findViewById(R.id.ppg_3);
 
         btnSaveData = view.findViewById(R.id.btn_save_data);
-        btnStopNotify = view.findViewById(R.id.btn_stop_notify);
+        btnStopNotify = view.findViewById(R.id.btn_swtich_notify_state);
         toolbar = view.findViewById(R.id.toolbar3);
     }
 
@@ -141,17 +148,20 @@ public class DataDisplayFragment extends Fragment {
         btnSaveData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                String content = txt.getText().toString(); // 获取 TextView 中的文本内容
-                DownloadData.saveStringToCSV("downloaded data", content, getContext());
-                 */
+                DownloadData.saveStringToCSV("downloaded data", txtBuilder.toString(), getContext());
             }
         });
         btnStopNotify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopRequiringData();
-                BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
+                if (isNotifying) {
+                    BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
+                    btnStopNotify.setText("开始接收");
+                }else{
+                    startNotify();
+                    btnStopNotify.setText("停止接收");
+                }
+                isNotifying = !isNotifying;
             }
         });
     }
@@ -179,6 +189,13 @@ public class DataDisplayFragment extends Fragment {
 
                     @Override
                     public void onCharacteristicChanged(byte[] data) {
+                        SensorData sensorData = Decoder.decode(data);
+                        if (sensorData != null) {
+                            txtBuilder.append(sensorData.toString());
+                        }
+
+                        Log.d("data", HexUtil.formatHexString(data, true).toString());
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

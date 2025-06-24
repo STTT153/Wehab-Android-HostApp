@@ -83,7 +83,7 @@ public class SensorConfigFragment extends DialogFragment {
         setUpSpinner(spinnerOdr, new String[]{"200", "100", "50", "25"});
         spinnerOdr.setSelection(0);
         setUpSpinner(spinnerInterval, new String[]{"50", "100", "200"});
-        spinnerInterval.setSelection(1);
+        spinnerInterval.setSelection(0);
 
         setUpSpinner(spinnerX, new String[]{"0", "1", "2", "3"});
         setUpSpinner(spinnerY, new String[]{"0", "1", "2", "3"});
@@ -129,48 +129,44 @@ public class SensorConfigFragment extends DialogFragment {
                         new BleWriteCallback() {
                             @Override
                             public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                android.widget.Toast.makeText(getContext(), "配置accel sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                //android.widget.Toast.makeText(getContext(), "配置accel sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
                                 Log.d("inst", "发送accel指令到设备成功");
-                            }
+                                BleManager.getInstance().write(
+                                        bleDevice,
+                                        UUID_SERVICE,
+                                        UUID_CHARACTERISTIC_WRITE,
+                                        inst2,
+                                        new BleWriteCallback() {
+                                            @Override
+                                            public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                                //android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
+                                                Log.d("inst", "发送ppg指令到设备成功");
+                                                // 切换显示的容器
+                                                requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.GONE);
+                                                requireActivity().findViewById(R.id.data_display_container).setVisibility(View.VISIBLE);
 
+                                                // 添加数据看板页面
+                                                DataDisplayFragment fragment = DataDisplayFragment.newInstance(bleDevice);
+                                                requireActivity().getSupportFragmentManager()
+                                                        .beginTransaction()
+                                                        .replace(R.id.data_display_container, fragment)
+                                                        .addToBackStack(null)
+                                                        .commit();
+                                            }
+
+                                            @Override
+                                            public void onWriteFailure(BleException exception) {
+                                                android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
+                                                Log.d("inst", "发送ppg指令到设备成功");
+                                            }
+                                        });
+                            }
                             @Override
                             public void onWriteFailure(BleException exception) {
                                 android.widget.Toast.makeText(getContext(), "配置accel sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
                                 Log.d("inst", "发送accel指令到设备成功");
                             }
                         });
-                BleManager.getInstance().write(
-                        bleDevice,
-                        UUID_SERVICE,
-                        UUID_CHARACTERISTIC_WRITE,
-                        inst2,
-                        new BleWriteCallback() {
-                            @Override
-                            public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
-                                Log.d("inst", "发送ppg指令到设备成功");
-                            }
-
-                            @Override
-                            public void onWriteFailure(BleException exception) {
-                                android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
-                                Log.d("inst", "发送ppg指令到设备成功");
-                            }
-                        });
-
-                // 切换显示的容器
-                requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.GONE);
-                requireActivity().findViewById(R.id.data_display_container).setVisibility(View.VISIBLE);
-
-                // 添加数据看板页面
-                DataDisplayFragment fragment = DataDisplayFragment.newInstance(bleDevice);
-
-                requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.data_display_container, fragment)
-                        .addToBackStack(null)
-                        .commit();
-
             } catch (NumberFormatException e) {
                 if (getContext() != null) {
                     android.widget.Toast.makeText(getContext(), "请输入有效数字", android.widget.Toast.LENGTH_SHORT).show();

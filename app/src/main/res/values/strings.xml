@@ -41,9 +41,9 @@
     <string name="start">开始获取数据数据</string>>
 
     <string name="btn_save_data">保存数据</string>>
-    <string name="btn_stop_notify">停止通知</string>>
+    <string name="btn_switch_notify_state">开始接收</string>>
     <string name="btn_confirm">确定</string>>
-    <string name="txt_ppg_interval">ppg发送间隔:</string>>
+    <string name="txt_ppg_interval">ppg采样间隔:</string>>
 
     <string name="hint_range">量程(G):</string>>
     <string name="hint_odr">ODR:</string>>
