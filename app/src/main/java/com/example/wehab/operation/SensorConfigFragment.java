@@ -28,6 +28,9 @@ import com.example.wehab.protocal.PpgConfig;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+
 
 public class SensorConfigFragment extends DialogFragment {
     // UI相关变量
@@ -118,55 +121,14 @@ public class SensorConfigFragment extends DialogFragment {
                 AccelConfig accelConfig = new AccelConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
                 byte[] inst1 = accelConfig.toHexByte();
 
-                PpgConfig ppgConfig = new PpgConfig(3, ppgInterval, true);
+                PpgConfig ppgConfig = new PpgConfig(2, ppgInterval, true);
                 byte[] inst2 = ppgConfig.toHexByte();
 
-                BleManager.getInstance().write(
-                        bleDevice,
-                        UUID_SERVICE,
-                        UUID_CHARACTERISTIC_WRITE,
-                        inst1,
-                        new BleWriteCallback() {
-                            @Override
-                            public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                //android.widget.Toast.makeText(getContext(), "配置accel sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
-                                Log.d("inst", "发送accel指令到设备成功");
-                                BleManager.getInstance().write(
-                                        bleDevice,
-                                        UUID_SERVICE,
-                                        UUID_CHARACTERISTIC_WRITE,
-                                        inst2,
-                                        new BleWriteCallback() {
-                                            @Override
-                                            public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                                //android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备成功", android.widget.Toast.LENGTH_SHORT).show();
-                                                Log.d("inst", "发送ppg指令到设备成功");
-                                                // 切换显示的容器
-                                                requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.GONE);
-                                                requireActivity().findViewById(R.id.data_display_container).setVisibility(View.VISIBLE);
+                PpgConfig ppgConfig2 = new PpgConfig(5, ppgInterval, true);
+                byte[] inst3 = ppgConfig2.toHexByte();
 
-                                                // 添加数据看板页面
-                                                DataDisplayFragment fragment = DataDisplayFragment.newInstance(bleDevice);
-                                                requireActivity().getSupportFragmentManager()
-                                                        .beginTransaction()
-                                                        .replace(R.id.data_display_container, fragment)
-                                                        .addToBackStack(null)
-                                                        .commit();
-                                            }
+                sendAllConfigs(bleDevice, inst1, inst3, inst2);
 
-                                            @Override
-                                            public void onWriteFailure(BleException exception) {
-                                                android.widget.Toast.makeText(getContext(), "配置ppg sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
-                                                Log.d("inst", "发送ppg指令到设备成功");
-                                            }
-                                        });
-                            }
-                            @Override
-                            public void onWriteFailure(BleException exception) {
-                                android.widget.Toast.makeText(getContext(), "配置accel sensor指令发送数据到设备失败", android.widget.Toast.LENGTH_SHORT).show();
-                                Log.d("inst", "发送accel指令到设备成功");
-                            }
-                        });
             } catch (NumberFormatException e) {
                 if (getContext() != null) {
                     android.widget.Toast.makeText(getContext(), "请输入有效数字", android.widget.Toast.LENGTH_SHORT).show();
@@ -174,6 +136,44 @@ public class SensorConfigFragment extends DialogFragment {
             }
         });
     }
+    private void sendAllConfigs(BleDevice bleDevice, byte[] inst1, byte[] inst2, byte[] inst3) {
+        AtomicInteger successCount = new AtomicInteger(0);
+        int totalCommands = 3;
+
+        BleWriteCallback callback = new BleWriteCallback() {
+            @Override
+            public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                int count = successCount.incrementAndGet();
+                Log.d("instruction", "第 " + count + " 条指令发送成功");
+                if (count == totalCommands) {
+                    // 所有指令都成功后跳转页面
+                    requireActivity().runOnUiThread(() -> {
+                        requireActivity().findViewById(R.id.main_ui_container).setVisibility(View.GONE);
+                        requireActivity().findViewById(R.id.data_display_container).setVisibility(View.VISIBLE);
+
+                        DataDisplayFragment fragment = DataDisplayFragment.newInstance(bleDevice);
+                        requireActivity().getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.data_display_container, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    });
+                }
+            }
+
+            @Override
+            public void onWriteFailure(BleException exception) {
+                android.widget.Toast.makeText(getContext(), "配置某个传感器指令失败: " + exception.getDescription(), android.widget.Toast.LENGTH_SHORT).show();
+                Log.e("instruction", "指令发送失败: " + exception.toString());
+                // 终止后续动作，无需再写入
+            }
+        };
+
+        BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE, inst1, callback);
+        BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE, inst2, callback);
+        BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE, inst3, callback);
+    }
+
 }
 
 

@@ -4,10 +4,10 @@ import androidx.annotation.NonNull;
 
 import com.example.wehab.protocal.SensorType;
 
-public class PpgData extends SensorData {
+public class HeartRatePpgData extends SensorData {
     public float[] data;
 
-    public PpgData(SensorType sensorType, long timestamp, int groupCount){
+    public HeartRatePpgData(SensorType sensorType, long timestamp, int groupCount){
         super(sensorType, timestamp, groupCount);
         data = new float[groupCount];
     }
@@ -32,11 +32,11 @@ public class PpgData extends SensorData {
     @Override
     public String toString(){
         StringBuilder result = new StringBuilder();
-        result.append("ppg传感器\n");
+        result.append("G_PPG传感器\n");
         result.append("时间戳：").append(this.timestamp).append("\n");
         result.append("数据组数：").append(this.groupCount).append("\n");
         for (int i = 0; i < groupCount; i++){
-            result.append("X: ").append(data[i]).append("\n");
+            result.append("G_PPG: ").append(data[i]).append("\n");
         }
         return result.toString();
     }

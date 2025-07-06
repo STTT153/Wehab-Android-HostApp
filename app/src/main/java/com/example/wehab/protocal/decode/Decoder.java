@@ -16,7 +16,8 @@ public class Decoder {
         return switch (type) {
             case 0x01 -> decodeAccel(data);
             case 0x02 -> decodeGyro(data);
-            case 0x04 -> decodePpg(data);
+            case 0x04 -> decodeHeartRatePpg(data);
+            case 0x05 -> decodeBloodOxygenPpg(data);
             default -> null;
         };
     }
@@ -47,6 +48,7 @@ public class Decoder {
         int millis = buffer.getShort(8) & 0xFFFF;
         long timestampMs = seconds * 1000L + millis;
         int accelGroupCount = (length - 8) / 12;
+
         AccelData parsedData = new AccelData(SensorType.ACCEL, timestampMs, accelGroupCount);
 
         if (!isDataValid(data)) {
@@ -100,10 +102,11 @@ public class Decoder {
         return parsedData;
     }
 
-    private static SensorData decodePpg(byte[] data) {
+    private static SensorData decodeHeartRatePpg(byte[] data) {
         if (!isDataValid(data)) {
             return null;
         }
+        Log.d("PPG", HexUtil.formatHexString(data, true));
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
 
         int length = buffer.get(2) & 0xFF;
@@ -112,15 +115,38 @@ public class Decoder {
         long timestampMs = seconds * 1000L + millis;
 
         int offset = 10;
-        int groupCount = (length - 7) / 4;
+        int groupCount = (length - 8) / 4;
 
-        PpgData parsedData = new PpgData(SensorType.PPG, timestampMs, groupCount);
+        HeartRatePpgData parsedData = new HeartRatePpgData(SensorType.HEART_RATE_PPG, timestampMs, groupCount);
 
         while (offset + 4 <= data.length - 1) { // 留出校验和
-            long value = buffer.getInt(offset) & 0xFFFFFFFFL;
+            long value = buffer.getInt(offset);
             parsedData.setData(value);
-
             offset += 4;
+        }
+        return parsedData;
+    }
+
+    private static SensorData decodeBloodOxygenPpg(byte[] data){
+        if (!isDataValid(data)) {
+            return null;
+        }
+        Log.d("PPG", "R_PPG， IR_PPG sent");
+        ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+        int length = buffer.get(2) & 0xFF;
+        long seconds = buffer.getInt(4) & 0xFFFFFFFFL;
+        int millis = buffer.getShort(8) & 0xFFFF;
+        long timestampMs = seconds * 1000L + millis;
+
+        int offset = 10;
+        int groupCount = (length - 8) / 8;
+
+        BloodOxygenPpgData parsedData = new BloodOxygenPpgData(SensorType.BLOOD_OXYGEN_PPG, timestampMs, groupCount);
+        while (offset + 8 <= data.length - 1) { // 留出校验和
+            long irValue = buffer.getInt(offset);
+            long rValue = buffer.getInt(offset + 4);
+            parsedData.setData(irValue, rValue);
+            offset += 8;
         }
         return parsedData;
     }

@@ -44,10 +44,10 @@ public class DataDisplayFragment extends Fragment {
     private Toolbar toolbar;
     private TextView accelX, accelY, accelZ;
     private TextView gyroX, gyroY, gyroZ;
-    private TextView ppg1, ppg2, ppg3;
+    private TextView ppgG, ppgIR, ppgR;
     private boolean isNotifying = false;
     private final StringBuilder txtBuilder = new StringBuilder();
-    private int count;
+   
 
     public DataDisplayFragment() {}
 
@@ -114,8 +114,12 @@ public class DataDisplayFragment extends Fragment {
                    accelY.setText(String.format("%.4f",parsedData.getFirstData()[1]));
                    accelZ.setText(String.format("%.4f",parsedData.getFirstData()[2]));
                    break;
-               case PPG:
-                   ppg1.setText(String.format("%.4f",parsedData.getFirstData()[0]));
+               case HEART_RATE_PPG:
+                   ppgG.setText(String.format("%.4f",parsedData.getFirstData()[0]));
+                   break;
+               case BLOOD_OXYGEN_PPG:
+                   ppgIR.setText(String.format("%.4f",parsedData.getFirstData()[0]));
+                   ppgR.setText(String.format("%.4f",parsedData.getFirstData()[1]));
                    break;
            }
         }
@@ -135,9 +139,9 @@ public class DataDisplayFragment extends Fragment {
         gyroY = view.findViewById(R.id.gyro_y);
         gyroZ = view.findViewById(R.id.gyro_z);
 
-        ppg1 = view.findViewById(R.id.ppg_1);
-        ppg2 = view.findViewById(R.id.ppg_2);
-        ppg3 = view.findViewById(R.id.ppg_3);
+        ppgG = view.findViewById(R.id.ppg_g);
+        ppgIR = view.findViewById(R.id.ppg_ir);
+        ppgR = view.findViewById(R.id.ppg_r);
 
         btnSaveData = view.findViewById(R.id.btn_save_data);
         btnStopNotify = view.findViewById(R.id.btn_swtich_notify_state);
@@ -148,7 +152,7 @@ public class DataDisplayFragment extends Fragment {
         btnSaveData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DownloadData.saveStringToCSV("downloaded data", txtBuilder.toString(), getContext());
+                saveData();
             }
         });
         btnStopNotify.setOnClickListener(new View.OnClickListener() {
@@ -165,12 +169,19 @@ public class DataDisplayFragment extends Fragment {
             }
         });
     }
+
+    private void saveData(){
+        DownloadData.saveStringToCSV("downloaded data", txtBuilder.toString(), getContext());
+        txtBuilder.setLength(0);
+    }
+
     private void setUpToolbar() {
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         activity.setSupportActionBar(toolbar);
         Objects.requireNonNull(activity.getSupportActionBar()).setTitle("数据看板");
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
     private void startNotify(){
         BleManager.getInstance().notify(
                 bleDevice,
@@ -193,8 +204,6 @@ public class DataDisplayFragment extends Fragment {
                         if (sensorData != null) {
                             txtBuilder.append(sensorData.toString());
                         }
-
-                        Log.d("data", HexUtil.formatHexString(data, true).toString());
 
                         runOnUiThread(new Runnable() {
                             @Override
