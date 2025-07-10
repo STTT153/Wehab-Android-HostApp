@@ -20,10 +20,9 @@ import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.BleManager;
 
 import com.clj.fastble.exception.BleException;
-import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
-import com.example.wehab.protocal.AccelConfig;
-import com.example.wehab.protocal.PpgConfig;
+import com.example.wehab.protocal.instruction.ImuConfig;
+import com.example.wehab.protocal.instruction.PpgConfig;
 
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
@@ -118,8 +117,8 @@ public class SensorConfigFragment extends DialogFragment {
                 int zOffset = Integer.parseInt(spinnerZ.getSelectedItem().toString());
                 int ppgInterval = Integer.parseInt(editInterval.getText().toString().trim());
 
-                AccelConfig accelConfig = new AccelConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
-                byte[] inst1 = accelConfig.toHexByte();
+                ImuConfig imuConfig = new ImuConfig(range, ord, interval, xOffset, yOffset, zOffset,true);
+                byte[] inst1 = imuConfig.toHexByte();
 
                 PpgConfig ppgConfig = new PpgConfig(2, ppgInterval, true);
                 byte[] inst2 = ppgConfig.toHexByte();

@@ -1,4 +1,4 @@
-package com.example.wehab.protocal;
+package com.example.wehab.protocal.instruction;
 
 public class PpgConfig {
     // 心率PPG配置字段

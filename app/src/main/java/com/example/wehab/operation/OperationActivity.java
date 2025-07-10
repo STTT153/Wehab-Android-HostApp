@@ -21,8 +21,10 @@ import com.clj.fastble.data.BleDevice;
 
 import com.clj.fastble.exception.BleException;
 import com.example.wehab.R;
-import com.example.wehab.protocal.AccelConfig;
-import com.example.wehab.protocal.PpgConfig;
+import com.example.wehab.protocal.instruction.ImuConfig;
+import com.example.wehab.protocal.instruction.InstSender;
+import com.example.wehab.protocal.instruction.PpgConfig;
+
 
 import java.util.Objects;
 
@@ -41,23 +43,41 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View v){
         int id = v.getId();
+        InstSender instSender = new InstSender(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE);
+        BleWriteCallback bleWriteCallback = new BleWriteCallback() {
+            @Override
+            public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                Log.d("inst", "数据写入成功");
+            }
+            @Override
+            public void onWriteFailure(BleException exception) {
+                Log.d("inst", "数据写入失败 " + exception.toString());
+            }
+        };
 
-        if (id == R.id.btn_start) {
-            // 启动 SensorConfigFragment 页面
-            SensorConfigFragment fragment = new SensorConfigFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.config_container, fragment)
-                    .addToBackStack(null)
-                    .commit();
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(KEY_DATA, bleDevice);
-            fragment.setArguments(bundle);
+        if (id == R.id.btn_start_imu) {
+            instSender.sendInstruction("imuStart", bleWriteCallback);
+            instSender.sendInstruction("ppgStop", bleWriteCallback);
+        } else if (id == R.id.btn_start_ppg) {
+            instSender.sendInstruction("ppgStart", bleWriteCallback);
+            instSender.sendInstruction("imuStop", bleWriteCallback);
         }
+
+        // 启动 DataDisplayFragment
+        findViewById(R.id.main_ui_container).setVisibility(View.GONE);
+        findViewById(R.id.data_display_container).setVisibility(View.VISIBLE);
+
+        DataDisplayFragment fragment = DataDisplayFragment.newInstance(bleDevice);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.data_display_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
     @Override
     public void onResume(){
         super.onResume();
-        stopRequiringData();
+
     }
 
     @Override
@@ -91,8 +111,11 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        Button btnStart = findViewById(R.id.btn_start);
-        btnStart.setOnClickListener(this);
+        Button btnStartImu = findViewById(R.id.btn_start_imu);
+        btnStartImu.setOnClickListener(this);
+
+        Button btnStartPpg = findViewById(R.id.btn_start_ppg);
+        btnStartPpg.setOnClickListener(this);
     }
 
     private void initData(){
@@ -108,8 +131,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.data_display_container).setVisibility(View.GONE);
     }
     private void stopRequiringData(){
-        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
-        byte[] inst1 = accelConfig.toHexByte();
+        ImuConfig imuConfig = new ImuConfig(16, 200, 100, 0, 0, 0,false);
+        byte[] inst1 = imuConfig.toHexByte();
         PpgConfig ppgConfig = new PpgConfig(2, 5, false);
         byte[] inst2 = ppgConfig.toHexByte();
 
@@ -119,12 +142,12 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                     new BleWriteCallback() {
                         @Override
                         public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                            Log.d("inst", "停止上传accel指令写成功");
+                            Log.d("instStop", "停止上传accel指令写成功");
                         }
 
                         @Override
                         public void onWriteFailure(BleException exception) {
-                            Log.d("inst", "停止上传accel指令写失败 " + exception.toString());
+                            Log.d("instStop", "停止上传accel指令写失败 " + exception.toString());
                         }
                     });
             BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,

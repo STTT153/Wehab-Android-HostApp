@@ -1,6 +1,6 @@
-package com.example.wehab.protocal;
+package com.example.wehab.protocal.instruction;
 
-public class AccelConfig {
+public class ImuConfig {
     // 这个类中的所有数据均为10进制 integer
     private int rangeG; // 2, 4, 8, 16
     private int odrHz;  // 25, 50, 100, 200
@@ -10,8 +10,8 @@ public class AccelConfig {
     private int offsetZ;
     private boolean enabled;
 
-    public AccelConfig(int rangeG, int odrHz, int sendIntervalMs,
-                       int offsetX, int offsetY, int offsetZ, boolean enabled) {
+    public ImuConfig(int rangeG, int odrHz, int sendIntervalMs,
+                     int offsetX, int offsetY, int offsetZ, boolean enabled) {
         this.rangeG = rangeG;
         this.odrHz = odrHz;
         this.sendIntervalMs = sendIntervalMs;

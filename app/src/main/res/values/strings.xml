@@ -38,13 +38,18 @@
     <string name="disconnect">断开连接</string>
     <string name="enter">进入操作</string>
 
-    <string name="start">开始获取数据数据</string>>
+    <!-- OperationActivity-->
+    <string name="start">开始获取数据</string>>
+    <string name="startPpg">获取PPG数据</string>>
+    <string name="startImu">获取IMU数据</string>>
 
+    <!-- SensorConfigFragment-->
     <string name="btn_save_data">保存数据</string>>
     <string name="btn_switch_notify_state">开始接收</string>>
     <string name="btn_confirm">确定</string>>
     <string name="txt_ppg_interval">ppg采样间隔:</string>>
 
+    <!-- DataDisplayFragment-->
     <string name="hint_range">量程(G):</string>>
     <string name="hint_odr">ODR:</string>>
     <string name="hint_interval">间隔(ms):</string>>

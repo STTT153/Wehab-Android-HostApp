@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleNotifyCallback;
@@ -25,10 +26,9 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 
-import com.clj.fastble.utils.HexUtil;
 import com.example.wehab.R;
-import com.example.wehab.protocal.AccelConfig;
-import com.example.wehab.protocal.PpgConfig;
+import com.example.wehab.protocal.instruction.ImuConfig;
+import com.example.wehab.protocal.instruction.PpgConfig;
 import com.example.wehab.protocal.SensorType;
 import com.example.wehab.protocal.decode.Decoder;
 import com.example.wehab.protocal.decode.SensorData;
@@ -47,7 +47,6 @@ public class DataDisplayFragment extends Fragment {
     private TextView ppgG, ppgIR, ppgR;
     private boolean isNotifying = false;
     private final StringBuilder txtBuilder = new StringBuilder();
-   
 
     public DataDisplayFragment() {}
 
@@ -58,7 +57,6 @@ public class DataDisplayFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +79,6 @@ public class DataDisplayFragment extends Fragment {
         setUpListeners();
         setUpToolbar();
     }
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -92,10 +89,9 @@ public class DataDisplayFragment extends Fragment {
         }
     }
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
         BleManager.getInstance().stopNotify(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_NOTIFY);
-        stopRequiringData(); // 建议加入这一行，确保传感器停止上传
+        super.onDestroy();
         listener.onFragmentDestroy();
     }
 
@@ -124,12 +120,10 @@ public class DataDisplayFragment extends Fragment {
            }
         }
     }
-
     private void runOnUiThread(Runnable runnable) {
         if (isAdded() && getActivity() != null)
             getActivity().runOnUiThread(runnable);
     }
-
     private void initView(View view){
         accelX = view.findViewById(R.id.accel_x);
         accelY = view.findViewById(R.id.accel_y);
@@ -147,7 +141,6 @@ public class DataDisplayFragment extends Fragment {
         btnStopNotify = view.findViewById(R.id.btn_swtich_notify_state);
         toolbar = view.findViewById(R.id.toolbar3);
     }
-
     private void setUpListeners(){
         btnSaveData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,12 +162,14 @@ public class DataDisplayFragment extends Fragment {
             }
         });
     }
-
     private void saveData(){
-        DownloadData.saveStringToCSV("downloaded data", txtBuilder.toString(), getContext());
-        txtBuilder.setLength(0);
+        if(txtBuilder.length() == 0){
+            Toast.makeText(getContext(), "目前无数据", Toast.LENGTH_SHORT).show();
+        }else {
+            DownloadData.saveStringToCSV("downloaded data", txtBuilder.toString(), getContext());
+            txtBuilder.setLength(0);
+        }
     }
-
     private void setUpToolbar() {
         AppCompatActivity activity = (AppCompatActivity) requireActivity();
         activity.setSupportActionBar(toolbar);
@@ -204,7 +199,6 @@ public class DataDisplayFragment extends Fragment {
                         if (sensorData != null) {
                             txtBuilder.append(sensorData.toString());
                         }
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -214,9 +208,9 @@ public class DataDisplayFragment extends Fragment {
                     }
                 });
     }
-    private void stopRequiringData(){
-        AccelConfig accelConfig = new AccelConfig(16, 200, 100, 0, 0, 0,false);
-        byte[] inst1 = accelConfig.toHexByte();
+    private void stopRequiringData(BleWriteCallback callBack){
+        ImuConfig imuConfig = new ImuConfig(16, 200, 100, 0, 0, 0,false);
+        byte[] inst1 = imuConfig.toHexByte();
         PpgConfig ppgConfig = new PpgConfig(2, 5, false);
         byte[] inst2 = ppgConfig.toHexByte();
 
@@ -227,24 +221,13 @@ public class DataDisplayFragment extends Fragment {
                         @Override
                         public void onWriteSuccess(int current, int total, byte[] justWrite) {
                             Log.d("inst", "停止上传accel指令写成功");
+
+                            BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE, inst2, callBack);
                         }
 
                         @Override
                         public void onWriteFailure(BleException exception) {
                             Log.d("inst", "停止上传accel指令写失败 " + exception.toString());
-                        }
-                    });
-            BleManager.getInstance().write(bleDevice, UUID_SERVICE, UUID_CHARACTERISTIC_WRITE,
-                    inst2,
-                    new BleWriteCallback() {
-                        @Override
-                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                            Log.d("inst", "停止上传ppg指令写成功");
-                        }
-
-                        @Override
-                        public void onWriteFailure(BleException exception) {
-                            Log.d("inst", "停止上传ppg指令写失败: " + exception.toString());
                         }
                     });
         } else {
